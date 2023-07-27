@@ -1,8 +1,8 @@
-package net.danieladrian.moviedb
+package net.danieladrian.moviedb.activity
 
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import net.danieladrian.moviedb.R
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
