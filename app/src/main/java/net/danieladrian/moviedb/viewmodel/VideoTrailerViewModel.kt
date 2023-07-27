@@ -4,13 +4,14 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import net.danieladrian.moviedb.helper.RetrofitHelper
 import net.danieladrian.moviedb.rest.params.result.ResultGenre
+import net.danieladrian.moviedb.rest.params.result.ResultUserReview
+import net.danieladrian.moviedb.rest.params.result.ResultVideos
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class GenreViewModel(application: Application): AndroidViewModel(application) {
+class VideoTrailerViewModel(application: Application): AndroidViewModel(application) {
 
     val CANCEL_LOAD:Int = -1
     val FAILED_LOAD:Int = 0
@@ -18,17 +19,17 @@ class GenreViewModel(application: Application): AndroidViewModel(application) {
     val SUCCESS_LOAD:Int = 2
 
     var status = MutableLiveData<Int>()
-    var genreData = MutableLiveData<ResultGenre>()
-    var request: Call<ResultGenre>? = null
-    fun doGet(){
-        if(status.value != ON_PROGRESS){
+    var videosData = MutableLiveData<ResultVideos>()
+    var request: Call<ResultVideos>? = null
+
+    fun doGet(movieID:Int){
+        if(status.value != ON_PROGRESS) {
             status.value = ON_PROGRESS
-            request = RetrofitHelper().getDefaultInterface(getApplication())?.getGenres("en")
-            request?.enqueue(object : Callback<ResultGenre> {
-                override fun onResponse(call: Call<ResultGenre>?, response: Response<ResultGenre>?) {
+            request?.enqueue(object : Callback<ResultVideos> {
+                override fun onResponse(call: Call<ResultVideos>?, response: Response<ResultVideos>?) {
                     if(call?.isExecuted!! && !call.isCanceled){
                         if(response?.code()==200){
-                            genreData.value = response.body()
+                            videosData.value = response.body()
                             status.value = SUCCESS_LOAD
                         }else{
                             status.value = FAILED_LOAD
@@ -38,7 +39,7 @@ class GenreViewModel(application: Application): AndroidViewModel(application) {
                     }
                 }
 
-                override fun onFailure(call: Call<ResultGenre>?, t: Throwable?) {
+                override fun onFailure(call: Call<ResultVideos>?, t: Throwable?) {
                     Log.d("Error Failure Genre",t.toString())
                     if(call?.isExecuted!! && !call.isCanceled){
                         status.value = FAILED_LOAD
