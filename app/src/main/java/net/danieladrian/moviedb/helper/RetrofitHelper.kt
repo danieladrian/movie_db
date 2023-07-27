@@ -2,6 +2,8 @@ package net.danieladrian.moviedb.helper
 
 import android.content.Context
 import com.google.gson.Gson
+import net.danieladrian.moviedb.BuildConfig
+import net.danieladrian.moviedb.rest.ApiConstant
 import net.danieladrian.moviedb.rest.ApiInterface
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
@@ -27,39 +29,21 @@ class RetrofitHelper {
                 .addInterceptor { chain ->
                     val original = chain.request()
 
-                    Log.send_debug_log("HELLOBILL OwnerApp", "" + original)
                     // Request customization: add request headers
                     val requestBuilder = original.newBuilder()
                         //                        .header("Authorization", basic)
+                        .header("Authorization", "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4MmExOGUwNGU4NzViNzA4YTAxMTU4NTk1Yzg4ZGZkNyIsInN1YiI6IjU5NTFkOWYwYzNhMzY4MTM4ODAxOWRkNSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.X5hArZWwx9bcElQtSrR41giLruyFlIaCMDPprcC6ZNI")
+                        .header("accept", "application/json")
                         .method(original.method(), original.body())
 
                     val request = requestBuilder.build()
 
-                    Log.send_debug_log("HELLOBILL OwnerApp", "" + request.body()!!)
                     val response = chain.proceed(request)
 
                     val responseBody = response.body()
                     val bodyString = responseBody!!.string()
                     //Crashlytics.log("URL :"+request.url().toString()+"\nREQUEST BODY:\n"+request.body()+"\nRESPONSE BODY\n"+bodyString);
                     //Crashlytics.logException(new Exception("logData"));
-                    try {
-                        val resultDefault = Gson().fromJson<ResultDefault>(bodyString, ResultDefault::class.java!!)
-
-                        if (resultDefault != null) {
-                            if (resultDefault!!.Errors != null && resultDefault!!.Errors!!.size > 0) {
-                                if (resultDefault!!.Status != null && resultDefault!!.Status === 1) {
-
-                                    val error = resultDefault!!.Errors?.get(0)
-                                    if (error?.ID.equals("TOKEN",true)) {
-
-                                        httpClient!!.dispatcher().cancelAll()
-                                    }
-                                }
-                            }
-                        }
-                    } catch (e: Exception) {
-
-                    }
 
 
                     response.newBuilder().body(ResponseBody.create(responseBody.contentType(), bodyString.toByteArray())).build()
@@ -71,7 +55,7 @@ class RetrofitHelper {
         val retrofitBuilder = Retrofit.Builder()
         retrofitBuilder.addConverterFactory(GsonConverterFactory.create())
         retrofitBuilder.client(httpClient!!)
-        retrofitBuilder.baseUrl(ApiConstant.BASE_URL)
+        retrofitBuilder.baseUrl(ApiConstant.apiBaseUrl)
         retrofit = retrofitBuilder.build()
         apiInterface = retrofit!!.create(ApiInterface::class.java)
         return apiInterface
