@@ -19,9 +19,9 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:padding="25dp"
-            android:text="Genre"
+            android:text="Movie DB"
             android:textColor="@color/white"
-            android:textSize="34sp"
+            android:textSize="24sp"
             android:textStyle="bold" />
 
         <ImageView
@@ -60,6 +60,17 @@
             android:gravity="center"
             android:text="Failed to load movie genre"
             android:textColor="@color/white" />
+
+        <TextView
+            android:id="@+id/btnRetry"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:clickable="true"
+            android:gravity="center"
+            android:text="Retry"
+            android:textColor="@color/ic_launcher_background"
+            android:textStyle="italic" />
     </LinearLayout>
 
 </LinearLayout>

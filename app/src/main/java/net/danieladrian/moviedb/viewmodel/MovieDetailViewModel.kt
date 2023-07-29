@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import net.danieladrian.moviedb.helper.RetrofitHelper
 import net.danieladrian.moviedb.rest.params.result.ResultGenre
 import net.danieladrian.moviedb.rest.params.result.ResultMovieByGenre
+import net.danieladrian.moviedb.rest.params.result.ResultMovieDetail
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -19,15 +20,15 @@ class MovieDetailViewModel(application: Application): AndroidViewModel(applicati
     val SUCCESS_LOAD:Int = 2
 
     var status = MutableLiveData<Int>()
-    var moviesData = MutableLiveData<ResultMovieByGenre>()
-    var request: Call<ResultMovieByGenre>? = null
+    var moviesData = MutableLiveData<ResultMovieDetail>()
+    var request: Call<ResultMovieDetail>? = null
 
-    fun doGet(genreID:Int){
+    fun doGet(movieID:Int){
         if(status.value != ON_PROGRESS) {
             status.value = ON_PROGRESS
-            request = RetrofitHelper().getDefaultInterface(getApplication())?.getMovieByGenre(genreID)
-            request?.enqueue(object : Callback<ResultMovieByGenre> {
-                override fun onResponse(call: Call<ResultMovieByGenre>?, response: Response<ResultMovieByGenre>?) {
+            request = RetrofitHelper().getDefaultInterface(getApplication())?.getMovieDetail(movieID)
+            request?.enqueue(object : Callback<ResultMovieDetail> {
+                override fun onResponse(call: Call<ResultMovieDetail>?, response: Response<ResultMovieDetail>?) {
                     if(call?.isExecuted!! && !call.isCanceled){
                         if(response?.code()==200){
                             moviesData.value = response.body()
@@ -40,7 +41,7 @@ class MovieDetailViewModel(application: Application): AndroidViewModel(applicati
                     }
                 }
 
-                override fun onFailure(call: Call<ResultMovieByGenre>?, t: Throwable?) {
+                override fun onFailure(call: Call<ResultMovieDetail>?, t: Throwable?) {
                     Log.d("Error Failure Genre",t.toString())
                     if(call?.isExecuted!! && !call.isCanceled){
                         status.value = FAILED_LOAD

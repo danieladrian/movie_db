@@ -3,6 +3,7 @@ package net.danieladrian.moviedb.rest.params.result
 class ResultMovieDetail {
     var adult:Boolean? = null
     var backdrop_path:String? = null
+    var poster_path:String? = null
     var budget:Int? = null
     var homepage:String? = null
     var id:Int? = null

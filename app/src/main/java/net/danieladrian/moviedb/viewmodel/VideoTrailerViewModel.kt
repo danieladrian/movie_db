@@ -4,6 +4,7 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import net.danieladrian.moviedb.helper.RetrofitHelper
 import net.danieladrian.moviedb.rest.params.result.ResultGenre
 import net.danieladrian.moviedb.rest.params.result.ResultUserReview
 import net.danieladrian.moviedb.rest.params.result.ResultVideos
@@ -19,17 +20,18 @@ class VideoTrailerViewModel(application: Application): AndroidViewModel(applicat
     val SUCCESS_LOAD:Int = 2
 
     var status = MutableLiveData<Int>()
-    var videosData = MutableLiveData<ResultVideos>()
+    var videosData = MutableLiveData<ArrayList<ResultVideos.VideosObject>>()
     var request: Call<ResultVideos>? = null
 
     fun doGet(movieID:Int){
         if(status.value != ON_PROGRESS) {
             status.value = ON_PROGRESS
+            request = RetrofitHelper().getDefaultInterface(getApplication())?.getVideos(movieID)
             request?.enqueue(object : Callback<ResultVideos> {
                 override fun onResponse(call: Call<ResultVideos>?, response: Response<ResultVideos>?) {
                     if(call?.isExecuted!! && !call.isCanceled){
                         if(response?.code()==200){
-                            videosData.value = response.body()
+                            videosData.value = response.body()?.results
                             status.value = SUCCESS_LOAD
                         }else{
                             status.value = FAILED_LOAD

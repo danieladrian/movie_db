@@ -19,19 +19,36 @@ class MovieByGenreViewModel(application: Application): AndroidViewModel(applicat
     val SUCCESS_LOAD:Int = 2
 
     var status = MutableLiveData<Int>()
-    var moviesData = MutableLiveData<ResultMovieByGenre>()
+    var moviesData = MutableLiveData<ArrayList<ResultMovieByGenre.MoviesObject>>()
     var request: Call<ResultMovieByGenre>? = null
 
-    fun doGet(genreID:Int){
+    var genreID = MutableLiveData<Int>()
+    var lastPage = MutableLiveData<Int>()
+    var maxPage = MutableLiveData<Int>()
+
+    fun getNextPage(){
+        doGet(genreID.value!!)
+    }
+    fun doGet(id:Int){
         if(status.value != ON_PROGRESS) {
             status.value = ON_PROGRESS
-            request = RetrofitHelper().getDefaultInterface(getApplication())?.getMovieByGenre(genreID)
+            var page = 1
+            if(lastPage.value != null){
+                page = lastPage.value!! + 1
+            }
+            genreID.value = id
+            request = RetrofitHelper().getDefaultInterface(getApplication())?.getMovieByGenre(id,page)
             request?.enqueue(object : Callback<ResultMovieByGenre> {
                 override fun onResponse(call: Call<ResultMovieByGenre>?, response: Response<ResultMovieByGenre>?) {
                     if(call?.isExecuted!! && !call.isCanceled){
                         if(response?.code()==200){
-                            moviesData.value = response.body()
+                            if( moviesData.value == null){
+                                moviesData.value = ArrayList()
+                            }
+                            moviesData.value?.addAll(response.body()?.results!!)
                             status.value = SUCCESS_LOAD
+                            maxPage.value = response.body()?.total_pages
+                            lastPage.value = response.body()?.page
                         }else{
                             status.value = FAILED_LOAD
                         }

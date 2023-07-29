@@ -20,19 +20,29 @@ class UserReviewViewModel(application: Application): AndroidViewModel(applicatio
     val SUCCESS_LOAD:Int = 2
 
     var status = MutableLiveData<Int>()
-    var userReviewData = MutableLiveData<ResultUserReview>()
+    var lastPage = MutableLiveData<Int>()
+    var maxPage = MutableLiveData<Int>()
+    var movieID = MutableLiveData<Int>()
+    var userReviewData = MutableLiveData<ArrayList<ResultUserReview.ReviewObject>>()
     var request: Call<ResultUserReview>? = null
 
-    fun doGet(movieID:Int){
-        if(status.value != ON_PROGRESS) {
+    fun getNextPage(){
+        doGet(movieID.value!!)
+    }
+
+    fun doGet(id:Int){
+        if(status.value != ON_PROGRESS && ((lastPage.value != maxPage.value) || (lastPage.value == null))) {
             status.value = ON_PROGRESS
-            request = RetrofitHelper().getDefaultInterface(getApplication())?.getUserReviews(movieID)
+            request = RetrofitHelper().getDefaultInterface(getApplication())?.getUserReviews(id)
             request?.enqueue(object : Callback<ResultUserReview> {
                 override fun onResponse(call: Call<ResultUserReview>?, response: Response<ResultUserReview>?) {
                     if(call?.isExecuted!! && !call.isCanceled){
                         if(response?.code()==200){
-                            userReviewData.value = response.body()
+                            userReviewData.value = response.body()?.results
                             status.value = SUCCESS_LOAD
+                            lastPage.value = response.body()?.page
+                            maxPage.value = response.body()?.total_pages
+                            movieID.value = id
                         }else{
                             status.value = FAILED_LOAD
                         }

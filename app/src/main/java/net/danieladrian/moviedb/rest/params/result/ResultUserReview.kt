@@ -17,6 +17,7 @@ class ResultUserReview {
             var name:String? = null
             var username:String? = null
             var avatar_path:String? = null
+            var rating:Int? = null
         }
     }
 }
